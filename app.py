@@ -88,7 +88,14 @@ def detect_language(text):
         return "unknown"
 
 def translate(text, src, tgt):
-    return GoogleTranslator(source=src, target=tgt).translate(text)
+    try:
+        if src in ["auto", "unknown", "zh", "zh-cn", "zh-tw"]:
+            return GoogleTranslator(target=tgt).translate(text)
+        else:
+            return GoogleTranslator(source=src, target=tgt).translate(text)
+    except Exception:
+        return "[Translation error]"
+
 
 # =============================
 # Sentiment analysis (window=3)
