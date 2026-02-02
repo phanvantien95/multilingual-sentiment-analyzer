@@ -90,7 +90,7 @@ def detect_language(text):
 def translate(text, src, tgt):
     try:
         if src in ["auto", "unknown", "zh", "zh-cn", "zh-tw"]:
-            return GoogleTranslator(target=tgt).translate(text)
+            return GoogleTranslator(target=tgt).translate(text) # tận dụng cơ chế tự nhận diện mạnh mẽ của Google
         else:
             return GoogleTranslator(source=src, target=tgt).translate(text)
     except Exception:
@@ -125,7 +125,6 @@ def sentiment_window3(text_en):
                 phrase = " ".join(tokens[i:i + j + 1])
 
                 if nxt in POSITIVE:
-                    score -= 1
                     neg_cnt += 1
                     highlights[phrase] = "neg"
 
@@ -137,7 +136,6 @@ def sentiment_window3(text_en):
                     break
 
                 if nxt in NEGATIVE:
-                    score += 1
                     pos_cnt += 1
                     highlights[phrase] = "pos"
 
@@ -153,17 +151,16 @@ def sentiment_window3(text_en):
         # Normal sentiment (CHỈ NẾU CHƯA BỊ CONSUME)
         if i not in used_indexes:
             if norm in POSITIVE:
-                score += 1
                 pos_cnt += 1
                 highlights[word] = "pos"
 
             elif norm in NEGATIVE:
-                score -= 1
                 neg_cnt += 1
                 highlights[word] = "neg"
 
         i += 1
 
+    score = pos_cnt - neg_cnt
     sentiment = "Positive" if score > 0 else "Negative" if score < 0 else "Neutral"
     return sentiment, score, pos_cnt, neg_cnt, highlights
 
