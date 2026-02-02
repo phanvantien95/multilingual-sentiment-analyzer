@@ -169,21 +169,22 @@ def sentiment_window3(text_en):
 # Highlight English text
 # =============================
 def render_highlight_en(text, highlights):
-    html = text
-    spans = []  # lưu (start, end, label)
+    spans = []  # Lưu (start, end, label)
 
-    # 1️⃣ Tìm tất cả match, phrase dài ưu tiên trước
+    # 1️⃣ Tìm TẤT CẢ các match, ưu tiên phrase dài trước
     for phrase in sorted(highlights, key=len, reverse=True):
         label = highlights[phrase]
+        # re.finditer trả về một iterator chứa tất cả các vị trí khớp
         for m in re.finditer(re.escape(phrase), text, flags=re.IGNORECASE):
             s, e = m.span()
 
-            # ❌ nếu span này nằm TRONG span đã có → bỏ
-            if any(s >= ps and e <= pe for ps, pe, _ in spans):
+            # Kiểm tra xem vị trí này có bị giao thoa với cụm đã highlight chưa
+            # (Giúp ưu tiên "not like" thay vì highlight riêng chữ "like")
+            if any(max(s, ps) < min(e, pe) for ps, pe, _ in spans):
                 continue
 
             spans.append((s, e, label))
-            break  # mỗi phrase chỉ highlight 1 lần
+            # ❌ ĐÃ XOÁ lệnh break tại đây để tìm được nhiều từ giống nhau
 
     # 2️⃣ Render từ trái sang phải
     spans.sort(key=lambda x: x[0])
@@ -201,7 +202,6 @@ def render_highlight_en(text, highlights):
         last = e
 
     result += text[last:]
-
     return f"<div style='font-size:16px;line-height:1.8'>{result}</div>"
 
 
